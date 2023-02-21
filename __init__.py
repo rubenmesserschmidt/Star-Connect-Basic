@@ -46,7 +46,41 @@ def get_active_vert(bm):
         return None
 
 
+##### Keymap #####
+
+
+def init_keymap():
+    wm = bpy.context.window_manager
+    kc = wm.keyconfigs
+    if kc:
+        km = kc.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
+        kmi = km.keymap_items.new(idname='scb.star_connect', type='S', value='PRESS', ctrl=True, alt=True)
+
+    addon_keymaps.append((km, kmi))
+
+
+def del_keymap():
+    for km, kmi in addon_keymaps:
+        try:
+            km.keymap_items.remove(kmi)
+        except:
+            continue
+
+    addon_keymaps.clear()
+
+
 ##### Operators #####
+
+
+class SCB_OT_ResetKeymap(Operator):
+    bl_idname = 'scb.reset_keymap'
+    bl_label = 'Reset'
+
+    def execute(self, context):
+        del_keymap()
+        init_keymap()
+        return {'FINISHED'}
+
 
 
 class SCB_OT_StarConnect(Operator):
@@ -80,9 +114,12 @@ class SCB_AP_AddonPreferences(AddonPreferences):
 
     def draw(self, context):
         layout: bpy.types.UILayout = self.layout
-        row = layout.row()
-        row.enabled = False
-        row.label(text='Keybinds')
+        col = layout.column()
+        row = col.row()
+        sub = row.column()
+        sub.enabled = False
+        sub.label(text='Keybinds')
+        row.operator('scb.reset_keymap')
 
         col = layout.column()
         kc = context.window_manager.keyconfigs.addon
@@ -95,7 +132,8 @@ class SCB_AP_AddonPreferences(AddonPreferences):
 
 classes = [
     SCB_OT_StarConnect,
-    SCB_AP_AddonPreferences
+    SCB_AP_AddonPreferences,
+    SCB_OT_ResetKeymap
 ]
 
 registered_classes = []
@@ -116,26 +154,14 @@ def register():
         bpy.utils.register_class(cls)
         registered_classes.append(cls)
 
-    wm = bpy.context.window_manager
-    kc = wm.keyconfigs
-    if kc:
-        km = kc.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
-        kmi = km.keymap_items.new(idname='scb.star_connect', type='S', value='PRESS', ctrl=True, alt=True)
-
-    addon_keymaps.append((km, kmi))
+    init_keymap()
 
 
 def unregister():
     for cls in registered_classes:
         bpy.utils.unregister_class(cls)
 
-    for km, kmi in addon_keymaps:
-        try:
-            km.keymap_items.remove(kmi)
-        except:
-            continue
-
-    addon_keymaps.clear()
+    del_keymap()
 
 
 if __name__ == "__main__":
