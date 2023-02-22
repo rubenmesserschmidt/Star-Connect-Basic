@@ -86,9 +86,10 @@ class SCB_OT_ResetKeymap(Operator):
 class SCB_OT_StarConnect(Operator):
     bl_idname = 'scb.star_connect'
     bl_label = 'Star Connect'
-    bl_options = {'UNDO'}
+    bl_options = {'UNDO', 'REGISTER'}
 
-    def execute(self, context):
+
+    def invoke(self, context, event):
         mode = context.mode
         if mode != 'EDIT_MESH':
             self.report({'WARNING'}, message='Star Connect works only in Edit Mode!')
@@ -104,6 +105,7 @@ class SCB_OT_StarConnect(Operator):
             bmesh.update_edit_mesh(mesh)
 
         return {'FINISHED'}
+    
 
 
 ##### Addon Preferences #####
