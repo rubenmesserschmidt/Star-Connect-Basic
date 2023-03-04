@@ -114,9 +114,21 @@ class SCB_OT_StarConnect(Operator):
 class SCB_AP_AddonPreferences(AddonPreferences):
     bl_idname = __package__
 
+    show_menu: bpy.props.BoolProperty(
+        name='Show Menu',
+        default=True,
+        description='Show operator in edit mode context menu'
+    )
+
     def draw(self, context):
         layout: bpy.types.UILayout = self.layout
         col = layout.column()
+        split = col.split()
+        sub = split.column()
+        sub.label(text='Show Menu')
+        sub = split.column()
+        sub.prop(self, 'show_menu', text='')
+        col.separator()
         row = col.row()
         sub = row.column()
         sub.enabled = False
@@ -129,6 +141,19 @@ class SCB_AP_AddonPreferences(AddonPreferences):
             col.context_pointer_set('keymap', km)
             rna_keymap_ui.draw_kmi([], kc, km, kmi, col, 0)
             col.separator()
+
+
+
+##### Draw Functions #####
+
+
+def draw_VIEW3D_MT_edit_mesh_context_menu(self, context):
+    if not bpy.context.preferences.addons['Star Connect Basic'].preferences.show_menu:
+        return
+    
+    layout: bpy.types.UILayout = self.layout
+    layout.operator_context = 'INVOKE_DEFAULT'
+    layout.operator('scb.star_connect')
 
 
 
@@ -156,14 +181,18 @@ def register():
         bpy.utils.register_class(cls)
         registered_classes.append(cls)
 
+    bpy.types.VIEW3D_MT_edit_mesh_context_menu.append(draw_VIEW3D_MT_edit_mesh_context_menu)
+
     init_keymap()
 
 
 def unregister():
+    del_keymap()
+    bpy.types.VIEW3D_MT_edit_mesh_context_menu.remove(draw_VIEW3D_MT_edit_mesh_context_menu)
+
     for cls in registered_classes:
         bpy.utils.unregister_class(cls)
 
-    del_keymap()
 
 
 if __name__ == "__main__":
