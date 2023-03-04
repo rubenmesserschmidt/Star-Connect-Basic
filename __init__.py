@@ -64,6 +64,7 @@ def del_keymap():
         try:
             km.keymap_items.remove(kmi)
         except:
+            print('hey')
             continue
 
     addon_keymaps.clear()
@@ -187,12 +188,14 @@ def register():
 
 
 def unregister():
-    del_keymap()
     bpy.types.VIEW3D_MT_edit_mesh_context_menu.remove(draw_VIEW3D_MT_edit_mesh_context_menu)
 
     for cls in registered_classes:
         bpy.utils.unregister_class(cls)
 
+    registered_classes.clear()
+
+    del_keymap()
 
 
 if __name__ == "__main__":
