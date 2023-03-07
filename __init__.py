@@ -160,19 +160,15 @@ class SCB_AP_AddonPreferences(AddonPreferences):
         layout.separator()
         sub = layout.column()
         sub.enabled = False
-        sub.label(text='Support')
+        sub.label(text='Upgrade')
         col = layout.column()
         split = col.split()
         sub = split.column()
         sub.scale_y = 1.5
-        sub.label(text='Get help and news')
-        sub.label(text='Say what you think')
-        sub.label(text='Reach the next level')
+        sub.label(text='Get Star Connect Pro')
 
         sub = split.column()
         sub.scale_y = 1.5
-        sub.operator('scb.open_link', text='Join Discord').link = 'https://discord.gg/fdF2cSRrtV'
-        sub.operator('scb.open_link', text='Leave a Rating').link = 'https://blendermarket.com/products/starconnect'
         sub.operator('scb.open_link', text='Upgrade to Pro').link = 'https://blendermarket.com/products/starconnect'
 
 
