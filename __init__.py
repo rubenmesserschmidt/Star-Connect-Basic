@@ -25,6 +25,7 @@ bl_info = {
     "category": "",
     "author": "Ruben Messerschmidt",
     "location": "",
+    'doc_url': 'https://star-connect.readthedocs.io/en/latest/',
 }
 
 bl_info['blender'] = getattr(bpy.app, "version")
@@ -32,6 +33,7 @@ bl_info['blender'] = getattr(bpy.app, "version")
 
 import bmesh
 import rna_keymap_ui
+import webbrowser
 from bpy.types import Operator, AddonPreferences
 
 
@@ -71,6 +73,18 @@ def del_keymap():
 
 
 ##### Operators #####
+
+
+class SCB_OT_OpenLink(Operator):
+    bl_idname='scb.open_link'
+    bl_label=''
+
+    link: bpy.props.StringProperty()
+
+    def execute(self, context):
+        webbrowser.open_new_tab(self.link)
+        return {'FINISHED'}
+    
 
 
 class SCB_OT_ResetKeymap(Operator):
@@ -143,6 +157,23 @@ class SCB_AP_AddonPreferences(AddonPreferences):
             rna_keymap_ui.draw_kmi([], kc, km, kmi, col, 0)
             col.separator()
 
+        layout.separator()
+        sub = layout.column()
+        sub.enabled = False
+        sub.label(text='Support')
+        col = layout.column()
+        split = col.split()
+        sub = split.column()
+        sub.scale_y = 1.5
+        sub.label(text='Get help and news')
+        sub.label(text='Say what you think')
+        sub.label(text='Reach the next level')
+
+        sub = split.column()
+        sub.scale_y = 1.5
+        sub.operator('scb.open_link', text='Join Discord').link = 'https://discord.gg/fdF2cSRrtV'
+        sub.operator('scb.open_link', text='Leave a Rating').link = 'https://blendermarket.com/products/starconnect'
+        sub.operator('scb.open_link', text='Upgrade to Pro').link = 'https://blendermarket.com/products/starconnect'
 
 
 ##### Draw Functions #####
@@ -161,7 +192,8 @@ def draw_VIEW3D_MT_edit_mesh_context_menu(self, context):
 classes = [
     SCB_OT_StarConnect,
     SCB_AP_AddonPreferences,
-    SCB_OT_ResetKeymap
+    SCB_OT_ResetKeymap,
+    SCB_OT_OpenLink
 ]
 
 registered_classes = []
