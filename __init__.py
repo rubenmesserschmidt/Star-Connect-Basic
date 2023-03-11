@@ -56,20 +56,16 @@ def init_keymap():
     kc = wm.keyconfigs
     if kc:
         km = kc.addon.keymaps.new(name='3D View', space_type='VIEW_3D')
-        kmi = km.keymap_items.new(idname='scb.star_connect', type='S', value='PRESS', ctrl=True, alt=True)
-
-    addon_keymaps.append((km, kmi))
+        kmi = km.keymap_items.new('scb.star_connect', type='S', value='PRESS', ctrl=True, alt=True)
+        addon_keymaps.append((km, kmi))
 
 
 def del_keymap():
     for km, kmi in addon_keymaps:
-        try:
-            km.keymap_items.remove(kmi)
-        except:
-            print('hey')
-            continue
+        km.keymap_items.remove(kmi)
 
     addon_keymaps.clear()
+
 
 
 ##### Operators #####
@@ -83,17 +79,6 @@ class SCB_OT_OpenLink(Operator):
 
     def execute(self, context):
         webbrowser.open_new_tab(self.link)
-        return {'FINISHED'}
-    
-
-
-class SCB_OT_ResetKeymap(Operator):
-    bl_idname = 'scb.reset_keymap'
-    bl_label = 'Reset'
-
-    def execute(self, context):
-        del_keymap()
-        init_keymap()
         return {'FINISHED'}
 
 
@@ -148,14 +133,35 @@ class SCB_AP_AddonPreferences(AddonPreferences):
         sub = row.column()
         sub.enabled = False
         sub.label(text='Keybinds')
-        row.operator('scb.reset_keymap')
 
         col = layout.column()
-        kc = context.window_manager.keyconfigs.addon
-        for km, kmi in addon_keymaps:
-            col.context_pointer_set('keymap', km)
-            rna_keymap_ui.draw_kmi([], kc, km, kmi, col, 0)
-            col.separator()
+
+        # draw keymap
+        wm = bpy.context.window_manager
+        kc = wm.keyconfigs.user
+        old_id_l = []
+
+        for km_add, kmi_add in addon_keymaps:
+            for km_con in kc.keymaps:
+                if km_add.name == km_con.name:
+                    km = km_con
+                    break
+
+            for kmi_con in km.keymap_items:
+                if kmi_add.idname == kmi_con.idname:
+
+                    if not kmi_con.id in old_id_l:
+                        kmi = kmi_con
+                        old_id_l.append(kmi_con.id)
+                        break
+
+            try:
+                col.context_pointer_set("keymap", km)
+                rna_keymap_ui.draw_kmi([], kc, km, kmi, col, 0)
+                col.separator()
+
+            except:
+                pass
 
         layout.separator()
         sub = layout.column()
@@ -188,7 +194,6 @@ def draw_VIEW3D_MT_edit_mesh_context_menu(self, context):
 classes = [
     SCB_OT_StarConnect,
     SCB_AP_AddonPreferences,
-    SCB_OT_ResetKeymap,
     SCB_OT_OpenLink
 ]
 
