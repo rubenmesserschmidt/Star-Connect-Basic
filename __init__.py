@@ -21,7 +21,7 @@ bl_info = {
     "name": "Star Connect Basic",
     "description": "",
     "blender": (2, 93, 0),
-    "version": (1, 0, 0),
+    'version': (1, 0, 1),
     "category": "",
     "author": "Ruben Messerschmidt",
     "location": "",
